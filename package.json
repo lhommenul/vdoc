@@ -8,8 +8,8 @@
   "module": "./dist/vue3doc.js",
   "exports": {
     ".": {
-      "import": "./dist/my-lib.js",
-      "require": "./dist/my-lib.umd.cjs"
+      "import": "./dist/vue3doc.js",
+      "require": "./dist/vue3doc.umd.cjs"
     }
   },
   "scripts": {

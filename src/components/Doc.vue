@@ -147,12 +147,17 @@ const defaultSchema = {
   ,footer : undefined
 }
 
+const item = {
+   name : undefined
+  ,type : undefined
+  ,value : undefined
+  ,description : undefined
+}
+
 export default {
 
-  name : 'DocHelloWorld'
-
   // PROPS 
-  ,props :{
+  props :{
     docData : {
       type : Object
       ,default : defaultSchema
@@ -183,6 +188,8 @@ export default {
       ,generatedDocComputed : null
       ,generatedDocMethods : null
       ,generatedDocEmits : null
+      ,examplesDocumentation : null
+      ,item : item
     }
   }
 
@@ -224,29 +231,46 @@ export default {
     } 
 
     ,getDocExamples(){
-    
-      this.$slots.examples().forEach( example => {
-        
-        let p = []
+
+      this.examplesDocumentation = this.$slots.examples().map( example => {
+
+        let itemsInThisExample = [];
 
         Object.entries( example.props ).map(([ key, value ]) => {
 
-          if( key.slice(0,2) === 'on' ) {
+          const propsIsEvent = ( key.slice(0,2) === 'on' )
 
-            const mEvent = key.slice(2,key.length).toLowerCase()
+          let searchPropsName = {
 
-            const mEmit = this.generatedDocEmits.filter( e => e.toLowerCase() === mEvent )
-
-            if ( !mEmit[0] ) console.warn(`${ key } is not declared in emits`);
-            else console.log(mEmit[0]);
+            // Does the props is an event
+             key : propsIsEvent ? key.slice(2,key.length).toLowerCase() : key
+            ,propsIsEvent : propsIsEvent
 
           }
 
-          console.log(key, value);
+          const mEmit = searchPropsName.propsIsEvent ? this.generatedDocEmits.items.filter( e => e?.name?.toLowerCase() === searchPropsName.key ) : this.generatedDocProps.items.filter( e => e?.name === searchPropsName.key )
+
+          if ( !mEmit[0] ) console.warn(`${ key } is not declared in emits`);
+          else {
+
+            const eventPropsMatched = mEmit[0];
+
+            itemsInThisExample.push( 
+              Object.entries(this.item).reduce((acc,[k,v])=>{
+
+                if ( k === 'type' ) acc[k] = searchPropsName.propsIsEvent ? 'event' : 'props'
+                else acc[k] = eventPropsMatched[k];
+
+                return acc;
+
+              },this.item)
+            )
+          
+          }
 
         })
 
-        console.log(p);
+        return itemsInThisExample;
 
       })
 
@@ -379,7 +403,14 @@ export default {
       if ( !emits ) return;
 
       this.generatedDocEmits = emits.reduce( ( acc, evt ) => {
-        
+
+        let match = acc.items.filter( ({ name:n }) => n === evt )
+
+        if ( !match[0] ){
+          acc.items.push({
+            name : evt
+          })
+        }
         
         return acc;
         

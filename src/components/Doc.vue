@@ -140,6 +140,13 @@
 
 <script>
 
+const defaultSchema = {
+  title : undefined
+  ,items : [ // List of data used inside the component
+  ]
+  ,footer : undefined
+}
+
 export default {
 
   name : 'DocHelloWorld'
@@ -148,19 +155,23 @@ export default {
   ,props :{
     docData : {
       type : Object
-      ,default : undefined
+      ,default : defaultSchema
     }
     ,docProps : {
       type : Object
-      ,default : undefined
+      ,default : defaultSchema
     }
     ,docComputed : {
       type : Object
-      ,default : undefined
+      ,default : defaultSchema
     }
     ,docMethods : {
       type : Object
-      ,default : undefined
+      ,default : defaultSchema
+    }
+    ,docEmits : {
+      type : Object
+      ,default : defaultSchema
     }
   }
 
@@ -220,7 +231,16 @@ export default {
 
         Object.entries( example.props ).map(([ key, value ]) => {
 
-          if( key.slice(0,2) === 'on' ) key.slice(2,key.length)
+          if( key.slice(0,2) === 'on' ) {
+
+            const mEvent = key.slice(2,key.length).toLowerCase()
+
+            const mEmit = this.generatedDocEmits.filter( e => e.toLowerCase() === mEvent )
+
+            if ( !mEmit[0] ) console.warn(`${ key } is not declared in emits`);
+            else console.log(mEmit[0]);
+
+          }
 
           console.log(key, value);
 
@@ -332,13 +352,6 @@ export default {
 
       if ( !methods ) return;
 
-      const defaultDocMethods = {
-        title : undefined
-        ,items : [ // List of data used inside the component
-        ]
-        ,footer : undefined
-      }
-      
       const dataMethods = Object.entries(methods).reduce(( acc, [ key, val ], i )=>{
 
         let match = acc.items.filter(( { name } ) => name === key )[0];
@@ -355,7 +368,7 @@ export default {
       
         return acc;
 
-      }, this.docMethods ?? defaultDocMethods )
+      }, this.docMethods )
 
       this.generatedDocMethods = dataMethods;      
 
@@ -363,7 +376,14 @@ export default {
 
     ,generateEmitsDoc( emits ){
 
-      console.log(emits);
+      if ( !emits ) return;
+
+      this.generatedDocEmits = emits.reduce( ( acc, evt ) => {
+        
+        
+        return acc;
+        
+      },this.docEmits)
 
     }
 

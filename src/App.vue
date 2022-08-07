@@ -7,6 +7,16 @@
     :docComputed="docComputed"
   >
     <HelloWorld></HelloWorld>
+    <template #examples >
+      <HelloWorld
+        @cstomEvent="$emit('dsq')"
+        @demoEvent="$emit('sqsqsqs')"
+        @DqmoEvent="$emit('sqsqsqs')"
+        propre="yes"
+        :active="false"
+        :funct="()=>{}"
+      ></HelloWorld>
+    </template>
   </Doc>
 
 </template>

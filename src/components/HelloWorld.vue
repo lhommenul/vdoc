@@ -54,7 +54,11 @@ export default {
       console.log(this.count);
     }
 
-  },
+  }
+
+  ,emits: [
+    "docType"
+  ]
 
 }
 </script>

@@ -8,6 +8,12 @@
       </slot>
     </div>
 
+    <!-- COMPONENT EXAMPLES -->
+    <div ref="doc-examples" >
+      <slot name="examples" >
+        You can place the component inside the <em>doc-examples</em> template to create examples
+      </slot>
+    </div>
 
     <div class="doc-container">
 
@@ -136,8 +142,10 @@
 
 export default {
 
+  name : 'DocHelloWorld'
+
   // PROPS 
-  props :{
+  ,props :{
     docData : {
       type : Object
       ,default : undefined
@@ -159,16 +167,18 @@ export default {
   // DATA
   ,data() {
     return {
-      generatedDocData : null   
+       generatedDocData : null   
       ,generatedDocProps : null   
       ,generatedDocComputed : null
       ,generatedDocMethods : null
+      ,generatedDocEmits : null
     }
   }
 
   // MOUNTED
   ,created() {
     this.getDocBody()
+    this.getDocExamples()
   }
 
   // METHODS
@@ -185,7 +195,8 @@ export default {
           ,props
           ,computed
           ,methods
-        ] = [ existingValues.data(), existingValues.props, existingValues.computed, existingValues.methods ]
+          ,emits
+        ] = [ existingValues.data(), existingValues.props, existingValues.computed, existingValues.methods, existingValues.emits ]
 
         this.generateDataDoc( data )
 
@@ -195,8 +206,31 @@ export default {
 
         this.generateMethodsDoc( methods )
 
+        this.generateEmitsDoc( emits )
+
       })
+
     } 
+
+    ,getDocExamples(){
+    
+      this.$slots.examples().forEach( example => {
+        
+        let p = []
+
+        Object.entries( example.props ).map(([ key, value ]) => {
+
+          if( key.slice(0,2) === 'on' ) key.slice(2,key.length)
+
+          console.log(key, value);
+
+        })
+
+        console.log(p);
+
+      })
+
+    }
 
     ,generateDataDoc( data ){ // Dev documentation
 
@@ -327,6 +361,12 @@ export default {
 
     }
 
+    ,generateEmitsDoc( emits ){
+
+      console.log(emits);
+
+    }
+
     ,replaceType( type ){ // WHEN A USER PROVIDE TYPE REPLACE IT BY A STRING
 
       if ( !type || typeof type === 'string' ) return type
@@ -338,16 +378,16 @@ export default {
 
     }
 
-    ,generateDocPage(){
-
-    }
-
   },
   
 }
 </script>
 
 <style scoped>
+.doc-main-container{
+  display: grid;
+  row-gap: 2rem;
+}
 .card-doc{
   --pad : 0.4rem;
   background-color: whitesmoke;
